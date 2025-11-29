@@ -1,0 +1,118 @@
+================================================================================
+  STEP 1: INSTALL PYTHON 3.12 (MANUAL STEP - ONLY DO THIS ONCE)
+================================================================================
+
+You need to install Python 3.12 before running the automated setup script.
+
+INSTRUCTIONS:
+─────────────────────────────────────────────────────────────────────────────
+
+1. OPEN WEB BROWSER
+   Go to: https://www.python.org/downloads/release/python-3127/
+
+2. DOWNLOAD INSTALLER
+   - Click "Windows installer (64-bit)"
+   - Wait for download to complete (about 25 MB)
+
+3. RUN INSTALLER
+   - Find the downloaded file (usually in Downloads folder)
+   - Double-click to run the installer
+   - Wait for the installation dialog to open
+
+4. IMPORTANT INSTALLATION SETTINGS
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ On the first screen, you'll see options. VERY IMPORTANT:               │
+   │                                                                          │
+   │ ☑ Install launcher for all users                                       │
+   │ ☑ Add Python 3.12 to PATH  <-- THIS IS VERY IMPORTANT!               │
+   │                                                                          │
+   │ Then click "Install Now"                                               │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+5. WAIT FOR INSTALLATION
+   The installer will run for about 1-2 minutes. Don't close it!
+   You'll see: "Setup was successful"
+
+6. FINISH
+   Click "Close" when done
+
+7. VERIFY INSTALLATION
+   - Open a NEW Command Prompt (not the old one if you had one open)
+   - Type: python3.12 --version
+   - You should see: Python 3.12.7
+
+================================================================================
+  AFTER PYTHON 3.12 IS INSTALLED
+================================================================================
+
+Then go back to c:\wamp64\www\Figmiz and run ONE of these:
+
+OPTION A - Command Prompt (CMD):
+─────────────────────────────────────────────────────────────────────────────
+1. Press Windows Key + R
+2. Type: cmd
+3. Press Enter
+4. Type: c:\wamp64\www\Figmiz\setup.bat
+5. Press Enter
+6. Wait 5-10 minutes while packages install
+
+
+OPTION B - PowerShell:
+─────────────────────────────────────────────────────────────────────────────
+1. Press Windows Key + X
+2. Click "Windows PowerShell (Admin)"
+3. Type: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+4. Type: Y and press Enter
+5. Type: c:\wamp64\www\Figmiz\setup.ps1
+6. Press Enter
+7. Wait 5-10 minutes while packages install
+
+================================================================================
+  WHAT HAPPENS NEXT
+================================================================================
+
+The automated script will:
+✓ Create a virtual environment
+✓ Activate it
+✓ Upgrade pip
+✓ Install FastAPI
+✓ Install OpenCV
+✓ Install face-recognition
+✓ Install dlib
+✓ Install all other required packages
+
+When done, you'll see:
+    "SETUP COMPLETE!"
+
+Then you can start the Face Recognition AI server:
+    python run.py
+
+And open your browser to: http://localhost:8000
+
+================================================================================
+  NEED HELP?
+================================================================================
+
+If you get an error about "Python 3.12 not found":
+- Make sure you installed Python 3.12 (not 3.11 or 3.10)
+- Make sure you checked "Add Python 3.12 to PATH" during installation
+- Close and reopen Command Prompt after installing Python
+
+If the setup script fails:
+- Make sure you're in the c:\wamp64\www\Figmiz directory
+- Try running as Administrator (right-click → Run as administrator)
+- Check that Python 3.12 is properly installed first
+
+================================================================================
+  READY? START HERE:
+================================================================================
+
+1. Download and install Python 3.12 from python.org (link above)
+2. Come back and run: setup.bat (or setup.ps1)
+3. Wait for "SETUP COMPLETE!" message
+4. Run: python run.py
+5. Open: http://localhost:8000
+
+Good luck! 🎉
+
+================================================================================

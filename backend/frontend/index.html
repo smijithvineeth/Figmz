@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto 20px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+
+        #captureCanvas,
+        #recognizeCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="file"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.6);
+        }
+
+        .status {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+            text-align: center;
+        }
+
+        .status.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .status.loading {
+            background: #cfe2ff;
+            border-left-color: #0d6efd;
+            color: #084298;
+        }
+
+        .people-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .people-list li {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .people-list li .info {
+            flex: 1;
+        }
+
+        .people-list li .name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .people-list li .count {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .face-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .face-info span {
+            display: inline-block;
+            margin-right: 15px;
+            color: #555;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            input[type="text"],
+            input[type="file"],
+            select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎥 Face Recognition AI</h1>
+            <p>Capture • Train • Recognize</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('capture')">📸 Capture</button>
+            <button class="tab-btn" onclick="switchTab('train')">🎓 Train</button>
+            <button class="tab-btn" onclick="switchTab('recognize')">🔍 Recognize</button>
+            <button class="tab-btn" onclick="switchTab('stats')">📊 Stats</button>
+        </div>
+
+        <!-- Capture Tab -->
+        <div id="capture" class="content active">
+            <div class="section-title">Capture Face Data</div>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                Enter a name and capture multiple photos of your face from different angles for better training.
+            </p>
+
+            <div class="input-group">
+                <input type="text" id="personName" placeholder="Enter your name" maxlength="50">
+                <button onclick="startCapture()" id="startCaptureBtn">Start Webcam</button>
+                <button onclick="stopCapture()" id="stopCaptureBtn" disabled>Stop Webcam</button>
+            </div>
+
+            <div class="video-container">
+                <canvas id="captureCanvas"></canvas>
+            </div>
+
+            <div class="controls">
+                <button onclick="startAutoCapture()" id="autoCapturBtn">🎬 Auto Capture</button>
+                <button class="btn-secondary" onclick="clearCaptures()">Clear</button>
+            </div>
+
+            <div id="captureStatus" class="status hidden"></div>
+
+            <div class="face-info">
+                <span>💡 Tip: Capture faces from different angles and lighting for better accuracy</span>
+            </div>
+        </div>
+
+        <!-- Train Tab -->
+        <div id="train" class="content">
+            <div class="section-title">Train Face Recognition Model</div>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Click the button below to train the model using all captured face images.
+            </p>
+
+            <div style="text-align: center;">
+                <button onclick="trainModel()" id="trainBtn" style="font-size: 1.1em; padding: 15px 50px;">
+                    🎓 Train Model
+                </button>
+            </div>
+
+            <div id="trainStatus" class="status hidden"></div>
+
+            <div style="margin-top: 30px;">
+                <h3 style="color: #333; margin-bottom: 15px;">Captured Faces</h3>
+                <div id="peopleListTrain"></div>
+            </div>
+        </div>
+
+        <!-- Recognize Tab -->
+        <div id="recognize" class="content">
+            <div class="section-title">Face Recognition</div>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                Real-time face detection and recognition using your trained model.
+            </p>
+
+            <div class="controls">
+                <button onclick="startRecognition()" id="startRecognizeBtn">Start Recognition</button>
+                <button onclick="stopRecognition()" id="stopRecognizeBtn" disabled class="btn-secondary">Stop</button>
+            </div>
+
+            <div class="video-container">
+                <canvas id="recognizeCanvas"></canvas>
+            </div>
+
+            <div class="face-info">
+                <span id="recognitionStats">Waiting to start...</span>
+            </div>
+
+            <div id="recognizeStatus" class="status hidden"></div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="stats" class="content">
+            <div class="section-title">System Statistics</div>
+
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <h3 style="color: #333; margin-bottom: 15px;">People in Database</h3>
+            <div id="peopleListStats"></div>
+
+            <div style="margin-top: 30px;">
+                <button onclick="refreshStats()" class="btn-secondary">🔄 Refresh</button>
+                <button onclick="deleteAllPeople()" class="btn-danger" style="margin-left: 10px;">🗑️ Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8000";
+        let captureCanvas, recognizeCanvas;
+        let captureCtx, recognizeCtx;
+        let captureSocket, recognizeSocket;
+        let recognitionActive = false;
+        let captureActive = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            captureCanvas = document.getElementById('captureCanvas');
+            recognizeCanvas = document.getElementById('recognizeCanvas');
+            captureCtx = captureCanvas.getContext('2d');
+            recognizeCtx = recognizeCanvas.getContext('2d');
+
+            // Set canvas sizes
+            captureCanvas.width = 640;
+            captureCanvas.height = 480;
+            recognizeCanvas.width = 640;
+            recognizeCanvas.height = 480;
+
+            refreshStats();
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.content').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Deactivate all tabs
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Activate button
+            event.target.classList.add('active');
+
+            // Stop streams when switching tabs
+            if (tabName !== 'capture') stopCapture();
+            if (tabName !== 'recognize') stopRecognition();
+
+            if (tabName === 'train') updatePeopleList('peopleListTrain');
+            if (tabName === 'stats') refreshStats();
+        }
+
+        // === CAPTURE FUNCTIONS ===
+        function startCapture() {
+            const personName = document.getElementById('personName').value;
+            if (!personName.trim()) {
+                showStatus('captureStatus', 'Please enter your name', 'error');
+                return;
+            }
+
+            captureActive = true;
+            document.getElementById('startCaptureBtn').disabled = true;
+            document.getElementById('stopCaptureBtn').disabled = false;
+
+            // Set canvas background
+            captureCtx.fillStyle = '#000';
+            captureCtx.fillRect(0, 0, captureCanvas.width, captureCanvas.height);
+
+            // Connect to capture WebSocket
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/capture`;
+
+            captureSocket = new WebSocket(wsUrl);
+            captureSocket.onmessage = handleCaptureFrame;
+            captureSocket.onerror = () => {
+                showStatus('captureStatus', 'Failed to connect to camera', 'error');
+                stopCapture();
+            };
+
+            showStatus('captureStatus', 'Camera started. Use Auto Capture to save images.', 'loading');
+        }
+
+        function stopCapture() {
+            captureActive = false;
+            if (captureSocket) {
+                captureSocket.close();
+            }
+            document.getElementById('startCaptureBtn').disabled = false;
+            document.getElementById('stopCaptureBtn').disabled = true;
+        }
+
+        function handleCaptureFrame(event) {
+            const message = event.data;
+            if (message.startsWith('error:')) {
+                showStatus('captureStatus', message.substring(6), 'error');
+                stopCapture();
+                return;
+            }
+
+            if (message.startsWith('frame:')) {
+                const frameData = message.substring(6).split('|');
+                const imgData = frameData[0];
+                const facesDetected = parseInt(frameData[1].split(':')[1]);
+
+                const img = new Image();
+                img.onload = function() {
+                    captureCtx.drawImage(img, 0, 0, captureCanvas.width, captureCanvas.height);
+
+                    // Draw face count
+                    captureCtx.fillStyle = '#00ff00';
+                    captureCtx.font = 'bold 16px Arial';
+                    captureCtx.fillText(`Faces detected: ${facesDetected}`, 10, 30);
+
+                    if (facesDetected > 0) {
+                        captureCtx.fillStyle = '#ffff00';
+                        captureCtx.fillText('Ready to capture!', 10, 60);
+                    }
+                };
+                img.src = 'data:image/jpeg;base64,' + imgData;
+            }
+        }
+
+        function startAutoCapture() {
+            const personName = document.getElementById('personName').value;
+            if (!personName.trim()) {
+                showStatus('captureStatus', 'Please enter your name', 'error');
+                return;
+            }
+
+            stopCapture();
+
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/auto-capture`;
+
+            captureSocket = new WebSocket(wsUrl);
+
+            captureSocket.onopen = () => {
+                captureSocket.send(personName);
+                showStatus('captureStatus', '🎬 Auto-capturing faces... Position your face in the camera', 'loading');
+            };
+
+            captureSocket.onmessage = (event) => {
+                const message = event.data;
+
+                if (message.startsWith('error:')) {
+                    showStatus('captureStatus', message.substring(6), 'error');
+                    captureSocket.close();
+                } else if (message.startsWith('status:')) {
+                    showStatus('captureStatus', message.substring(7), 'loading');
+                } else if (message.startsWith('captured:')) {
+                    const parts = message.substring(9).split('|');
+                    const captured = parts[0];
+                    const detected = parts[1].split(':')[1];
+                    showStatus('captureStatus', `📸 Auto-capturing... ${captured} frames captured (${detected} faces detected)`, 'loading');
+                } else if (message.startsWith('frame:')) {
+                    const frameData = message.substring(6).split('|');
+                    const imgData = frameData[0];
+                    const captured = frameData[1].split(':')[1];
+
+                    const img = new Image();
+                    img.onload = function() {
+                        captureCtx.drawImage(img, 0, 0, captureCanvas.width, captureCanvas.height);
+                        captureCtx.fillStyle = '#00ff00';
+                        captureCtx.font = 'bold 18px Arial';
+                        captureCtx.fillText(`Captured: ${captured}`, 10, 40);
+                    };
+                    img.src = 'data:image/jpeg;base64,' + imgData;
+                } else if (message.startsWith('complete:')) {
+                    showStatus('captureStatus', `✓ ${message.substring(9)}`, 'success');
+                    updatePeopleList('peopleListTrain');
+                }
+            };
+
+            captureSocket.onerror = () => {
+                showStatus('captureStatus', 'Failed to connect to auto-capture', 'error');
+            };
+        }
+
+        async function captureFace() {
+            const personName = document.getElementById('personName').value;
+            if (!personName.trim()) {
+                showStatus('captureStatus', 'Please enter your name', 'error');
+                return;
+            }
+
+            if (!captureActive) {
+                showStatus('captureStatus', 'Please start the webcam first', 'error');
+                return;
+            }
+
+            try {
+                // Capture from canvas
+                captureCanvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append('name', personName);
+                    formData.append('file', blob, 'face.jpg');
+
+                    const response = await fetch(`${API_BASE}/api/capture-face`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        showStatus('captureStatus',
+                            `✓ Face captured! (${data.faces_detected} face(s) detected)`,
+                            'success');
+                    } else {
+                        showStatus('captureStatus', `Error: ${data.detail}`, 'error');
+                    }
+                });
+            } catch (error) {
+                showStatus('captureStatus', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearCaptures() {
+            if (confirm('Clear all captures for this person?')) {
+                const personName = document.getElementById('personName').value;
+                if (personName.trim()) {
+                    deletePersonData(personName);
+                }
+            }
+        }
+
+        // === TRAIN FUNCTIONS ===
+        async function trainModel() {
+            const trainBtn = document.getElementById('trainBtn');
+            trainBtn.disabled = true;
+
+            showStatus('trainStatus', '🔄 Training model... This may take a few minutes', 'loading');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/train`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    showStatus('trainStatus',
+                        `✓ Model trained successfully!\nFaces trained: ${data.faces_trained}`,
+                        'success');
+                    updatePeopleList('peopleListTrain');
+                } else {
+                    showStatus('trainStatus', `Error: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showStatus('trainStatus', `Error: ${error.message}`, 'error');
+            } finally {
+                trainBtn.disabled = false;
+            }
+        }
+
+        // === RECOGNITION FUNCTIONS ===
+        function startRecognition() {
+            recognitionActive = true;
+            document.getElementById('startRecognizeBtn').disabled = true;
+            document.getElementById('stopRecognizeBtn').disabled = false;
+
+            recognizeCtx.fillStyle = '#000';
+            recognizeCtx.fillRect(0, 0, recognizeCanvas.width, recognizeCanvas.height);
+
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/recognize`;
+
+            recognizeSocket = new WebSocket(wsUrl);
+            recognizeSocket.onmessage = handleRecognitionFrame;
+            recognizeSocket.onerror = () => {
+                showStatus('recognizeStatus', 'Failed to connect to camera', 'error');
+                stopRecognition();
+            };
+
+            showStatus('recognizeStatus', '🔍 Recognition active...', 'loading');
+        }
+
+        function stopRecognition() {
+            recognitionActive = false;
+            if (recognizeSocket) {
+                recognizeSocket.close();
+            }
+            document.getElementById('startRecognizeBtn').disabled = false;
+            document.getElementById('stopRecognizeBtn').disabled = true;
+            document.getElementById('recognitionStats').textContent = 'Stopped';
+        }
+
+        function handleRecognitionFrame(event) {
+            const message = event.data;
+            if (message.startsWith('error:')) {
+                showStatus('recognizeStatus', message.substring(6), 'error');
+                stopRecognition();
+                return;
+            }
+
+            if (message.startsWith('frame:')) {
+                const frameData = message.substring(6).split('|');
+                const imgData = frameData[0];
+                const facesDetected = parseInt(frameData[1].split(':')[1]);
+
+                const img = new Image();
+                img.onload = function() {
+                    recognizeCtx.drawImage(img, 0, 0, recognizeCanvas.width, recognizeCanvas.height);
+
+                    // Draw stats
+                    recognizeCtx.fillStyle = '#00ff00';
+                    recognizeCtx.font = 'bold 16px Arial';
+                    recognizeCtx.fillText(`Faces detected: ${facesDetected}`, 10, 30);
+
+                    document.getElementById('recognitionStats').textContent =
+                        `Faces detected: ${facesDetected} | Status: Active`;
+                };
+                img.src = 'data:image/jpeg;base64,' + imgData;
+            }
+        }
+
+        // === STATS FUNCTIONS ===
+        async function refreshStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/stats`);
+                const data = await response.json();
+
+                // Update stats cards
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="number">${data.total_people}</div>
+                        <div class="label">People</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${data.total_faces}</div>
+                        <div class="label">Faces Captured</div>
+                    </div>
+                `;
+
+                // Update people list
+                updatePeopleListStats(data.people);
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        async function updatePeopleList(elementId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/people`);
+                const data = await response.json();
+
+                const element = document.getElementById(elementId);
+                if (data.people.length === 0) {
+                    element.innerHTML = '<p style="text-align: center; color: #999;">No people in database yet</p>';
+                } else {
+                    let html = '<ul class="people-list">';
+                    data.people.forEach(person => {
+                        html += `
+                            <li>
+                                <div class="info">
+                                    <div class="name">${person.name}</div>
+                                    <div class="count">${person.face_count} face(s) captured</div>
+                                </div>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    element.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error fetching people list:', error);
+            }
+        }
+
+        function updatePeopleListStats(people) {
+            const element = document.getElementById('peopleListStats');
+            if (people.length === 0) {
+                element.innerHTML = '<p style="text-align: center; color: #999;">No people in database yet</p>';
+            } else {
+                let html = '<ul class="people-list">';
+                people.forEach(person => {
+                    const name = typeof person === 'string' ? person : person.name;
+                    const faceCount = typeof person === 'string' ? 0 : person.face_count;
+                    html += `
+                        <li>
+                            <div class="info">
+                                <div class="name">${name}</div>
+                                <div class="count">${faceCount} face(s) captured</div>
+                            </div>
+                            <button class="btn-danger" onclick="deletePerson('${name}')" style="padding: 8px 15px; font-size: 0.9em;">
+                                Delete
+                            </button>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+                element.innerHTML = html;
+            }
+        }
+
+        async function deletePersonData(name) {
+            try {
+                const response = await fetch(`${API_BASE}/api/people/${name}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    showStatus('captureStatus', `✓ Deleted all captures for ${name}`, 'success');
+                    updatePeopleList('peopleListTrain');
+                } else {
+                    showStatus('captureStatus', `Error: ${data.detail}`, 'error');
+                }
+            } catch (error) {
+                showStatus('captureStatus', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function deletePerson(name) {
+            if (confirm(`Delete all data for ${name}?`)) {
+                await deletePersonData(name);
+                refreshStats();
+            }
+        }
+
+        async function deleteAllPeople() {
+            if (confirm('Delete ALL people and faces? This cannot be undone!')) {
+                try {
+                    const response = await fetch(`${API_BASE}/api/people`);
+                    const data = await response.json();
+
+                    for (const person of data.people) {
+                        await fetch(`${API_BASE}/api/people/${person.name}`, {
+                            method: 'DELETE'
+                        });
+                    }
+
+                    refreshStats();
+                    alert('✓ All data deleted');
+                } catch (error) {
+                    alert(`Error: ${error.message}`);
+                }
+            }
+        }
+
+        // === UTILITY FUNCTIONS ===
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+            element.classList.remove('hidden');
+
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    element.classList.add('hidden');
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

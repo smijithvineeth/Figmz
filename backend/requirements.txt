@@ -1,0 +1,24 @@
+# Face Recognition AI Requirements
+# Compatible with Python 3.10, 3.11, 3.12, 3.13
+# NOT compatible with Python 3.14 (use 3.12 instead)
+
+# Web Framework
+fastapi==0.109.0
+uvicorn==0.27.0
+
+# Video & Image Processing
+opencv-python==4.9.0.80
+Pillow==11.0.0
+
+# Face Recognition & Detection
+face-recognition==1.3.0
+dlib==19.24.6
+
+# Numerical Computing & ML
+numpy==1.26.3
+scipy==1.11.4
+scikit-learn==1.3.2
+
+# Utilities
+python-multipart==0.0.6
+python-dotenv==1.0.0

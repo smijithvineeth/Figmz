@@ -1,0 +1,93 @@
+================================================================================
+  FACE RECOGNITION AI - QUICK SETUP
+================================================================================
+
+⚠️  IMPORTANT: You have Python 3.14, but you need Python 3.10-3.13
+
+STEP 1: Download Python 3.13
+────────────────────────────────────────────────────────────────────────────────
+1. Go to: https://www.python.org/downloads/release/python-3137/
+2. Download "Windows installer (64-bit)"
+3. Run installer with "Add Python 3.13 to PATH" checked
+
+STEP 2: Run Automated Setup
+────────────────────────────────────────────────────────────────────────────────
+Open Command Prompt and run:
+
+    cd c:\wamp64\www\Figmiz
+    setup.bat
+
+The setup.bat will automatically:
+   - Create virtual environment
+   - Activate it
+   - Install all dependencies (FastAPI, OpenCV, face-recognition, dlib, etc.)
+
+This takes 5-10 minutes. Be patient while packages compile!
+
+STEP 3: Run the Application
+────────────────────────────────────────────────────────────────────────────────
+In the SAME Command Prompt window after setup.bat completes:
+
+    python run.py
+
+You should see:
+    🚀 Starting Face Recognition AI Server
+    📍 Server running at: http://localhost:8000
+
+STEP 4: Open Browser
+────────────────────────────────────────────────────────────────────────────────
+Navigate to: http://localhost:8000
+
+Done! You're ready to use Face Recognition AI.
+
+================================================================================
+  USAGE
+================================================================================
+
+1. 📸 CAPTURE TAB
+   - Enter your name
+   - Click "Start Webcam"
+   - Click "Capture Face" 5-10 times from different angles
+   - Click "Stop Webcam"
+
+2. 🎓 TRAIN TAB
+   - Click "Train Model"
+   - Wait for completion
+
+3. 🔍 RECOGNIZE TAB
+   - Click "Start Recognition"
+   - Your face will be identified in real-time
+
+================================================================================
+  TROUBLESHOOTING
+================================================================================
+
+Problem: "python3.12 not found"
+Solution: Install Python 3.12 from https://python.org
+
+Problem: "No module named 'fastapi'"
+Solution: Make sure virtual environment is activated:
+          venv\Scripts\activate
+
+Problem: Installation takes too long
+Solution: This is normal! dlib compiles from source. Takes 5-10 minutes.
+
+Problem: Camera not working
+Solution:
+   1. Grant browser permission to camera
+   2. Check camera isn't used by another app
+   3. Refresh the page
+
+Problem: Low recognition accuracy
+Solution: Capture more photos (10+ per person) with different angles
+
+================================================================================
+  DOCUMENTATION
+================================================================================
+
+For more details, see:
+- INSTALLATION_GUIDE.md  (Detailed setup instructions)
+- README.md              (Feature overview)
+- SETUP.md              (Advanced configuration)
+
+================================================================================
